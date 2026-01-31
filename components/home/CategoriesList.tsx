@@ -8,7 +8,7 @@ type CategoriesListProps = {
 }
 
 const CategoriesList = ({category, search}: CategoriesListProps) => {
-  const searchTerm = search ? `&search${search}` : '';
+  const searchTerm = search ? `&search=${search}` : '';
   return (
    <section>
     <ScrollArea className='py-6'>

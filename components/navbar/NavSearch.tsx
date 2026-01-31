@@ -1,8 +1,48 @@
-import { Input } from '../ui/input' 
+'use client'
+import { Input } from '../ui/input';
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import { useDebouncedCallback } from 'use-debounce';
+import { useState, useEffect } from 'react';
 
 const NavSearch = () => {
+  // query params only
+  const searchParams = useSearchParams();
+
+  // basePath witout query params
+  const pathname = usePathname()
+  // programatic navigation
+  const {replace} = useRouter() 
+
+  const [search, setSearch] = useState(searchParams.get('search')?.toString() || '')
+
+  const handleSearch = useDebouncedCallback((value: string) => {
+    // clone params
+    const params = new URLSearchParams(searchParams)
+    if(value) {
+      params.set('search',value)
+    } else {
+      params.delete('search')
+    }
+    replace(`${pathname}?${params.toString()}`)
+  }, 300)
+
+  useEffect(()=> {
+    if(!searchParams.get('search')) {
+      setSearch('')
+    }
+  }, [searchParams.get('search')])
+
   return (
-    <Input type='text' placeholder='find a property...' className='max-w-xs dark:bg-muted' />
+    <Input 
+      type='text' 
+      placeholder='find a property...' 
+      className='max-w-xs dark:bg-muted'
+      value={search}
+      onChange={e => {
+        handleSearch(e.target.value)
+        setSearch(e.target.value)
+      }}
+    />
   )
 }
 

@@ -190,5 +190,9 @@ export const fetchProperties = async ({search = '', category}: {search?: string,
       createdAt: 'desc'
     }
   })
+
+  // await delay(3000) emulate latency
   return properties
 }
+
+export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
