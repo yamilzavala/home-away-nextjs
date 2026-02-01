@@ -23,7 +23,7 @@ export const createProfileAction = async (
     // db
     await db.profile.create({
       data: {
-        clerkId: user.id,
+        clerkId: user?.id,
         email: user.emailAddresses[0].emailAddress,
         profileImage: user.imageUrl ?? '',
         firstName: validatedFields.firstName,
@@ -33,7 +33,7 @@ export const createProfileAction = async (
     });
 
     // lib
-    await clerkClient.users.updateUserMetadata(user.id, {
+    await clerkClient.users.updateUserMetadata(user?.id, {
       privateMetadata: {
         hasProfile: true,
       },
@@ -52,7 +52,7 @@ export const fetchProfileImage = async () => {
 
   const profile= await db.profile.findUnique({
     where: {
-      clerkId: user.id,
+      clerkId: user?.id,
     },
     select: {
       profileImage: true,
@@ -77,7 +77,7 @@ export const fetchProfile = async () => {
 
   const profile = await db.profile.findUnique({
     where: {
-      clerkId: user.id,
+      clerkId: user?.id,
     },
   });
   if (!profile) return redirect('/profile/create');
@@ -106,7 +106,7 @@ export const updateProfileAction = async (
     // db 
     await db.profile.update({
       where: {
-        clerkId: user.id,
+        clerkId: user?.id,
       },
       data: validatedFields,
     });
@@ -130,7 +130,7 @@ export const updateProfileImageAction = async (prevState: any, formData: FormDat
     // db
     await db.profile.update({
       where: {
-        clerkId: user.id
+        clerkId: user?.id
       }, data: {
         profileImage: fullPath
       }
@@ -160,7 +160,7 @@ export const createPropertyAction = async (prevState: any, formData: FormData): 
       data: {
         ...validatedFields,
         image: fullPath,
-        profileId: user.id
+        profileId: user?.id
       }
     })
   } catch (error) {
@@ -196,3 +196,88 @@ export const fetchProperties = async ({search = '', category}: {search?: string,
 }
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+export const fetchFavoriteId = async ({
+  propertyId,
+}: {
+  propertyId: string;
+}) => {
+  const { userId } = auth();
+  if (!userId) return null;
+
+  const favorite = await db.favorite.findFirst({
+    where: {
+      propertyId,
+      profileId: userId,
+    },
+    select: {
+      id: true,
+    },
+  });
+  return favorite?.id || null;
+};
+
+export const toggleFavoriteAction = async (prevState: {
+  propertyId: string;
+  favoriteId: string | null;
+  pathname: string;
+}) => {
+  const user = await getAuthUser();
+  // data
+  const { propertyId, favoriteId, pathname } = prevState;
+
+  // db
+  try {
+    if (favoriteId) {
+      await db.favorite.delete({
+        where: {
+          id: favoriteId,
+        },
+      });
+    } else {
+      await db.favorite.create({
+        data: {
+          propertyId,
+          profileId: user?.id,
+        },
+      });
+    }
+    revalidatePath(pathname);
+    return { message: favoriteId ? 'Removed from Favorites' : 'Added to Favorites' };
+  } catch (error) {
+    return renderError(error);
+  }
+};
+
+export const fetchFavorites = async () => {
+  const user = await getAuthUser()
+  const favorites = await db.favorite.findMany({
+    where: {
+      profileId: user?.id
+    },
+    select: {
+      property: {
+        select: {
+          id: true,
+          name: true,
+          tagline: true,
+          price: true,
+          country: true,
+          image: true,
+        },
+      },
+    },
+  })
+  return favorites.map(item => item.property)
+}
+
+export const fetchPropertyDetails = (id: string) => {
+  return db.property.findUnique({
+    where: {
+      id
+    },
+    include: {
+      profile: true
+    }
+  })
+}

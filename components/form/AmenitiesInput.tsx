@@ -29,7 +29,7 @@ const AmenitiesInput = ({defaultValue}: AmenitiesInputProps) => {
         <input type='hidden' name='amenities' value={JSON.stringify(selectedAmenities)} />
         <div className='grid md:grid-cols-2 gap-4'>
             {selectedAmenities.map(amenitie => (
-                <div className='flex items-center space-x-2'>
+                <div className='flex items-center space-x-2' key={amenitie.name}>
                     <Checkbox 
                         id={amenitie.name}
                         checked={amenitie.selected}
