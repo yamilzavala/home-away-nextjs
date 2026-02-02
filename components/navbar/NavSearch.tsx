@@ -7,10 +7,8 @@ import { useState, useEffect } from 'react';
 const NavSearch = () => {
   // query params only
   const searchParams = useSearchParams();
-
   // programatic navigation
   const {replace} = useRouter() 
-
   const [search, setSearch] = useState(searchParams.get('search')?.toString() || '')
 
   const handleSearch = useDebouncedCallback((value: string) => {
