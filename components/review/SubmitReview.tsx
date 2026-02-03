@@ -20,7 +20,7 @@ const SubmitReview = ({propertyId}:{propertyId: string}) => {
                 <FormContainer
                 action={createReviewAction}
                 >
-                    <input type="hidden" name='propertyId' />
+                    <input type="hidden" name='propertyId' value={propertyId}/>
                     <RatingInput name='rating' />
                     <TextAreaInput 
                         name='comment'
