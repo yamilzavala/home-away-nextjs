@@ -1,5 +1,5 @@
 import { fetchProfileImage } from '@/utils/actions';
-import { LuUser2 } from 'react-icons/lu';
+import { LuUser } from 'react-icons/lu';
 
 const UserIcon = async () => {
   const profileImage = await fetchProfileImage()
@@ -8,7 +8,7 @@ const UserIcon = async () => {
   }
 
   return (
-    <LuUser2 className='w-6 h-6 bg-primary rounded-full text-white' />
+    <LuUser className='w-6 h-6 bg-primary rounded-full text-white' />
   )
 }
 
