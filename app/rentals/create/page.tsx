@@ -46,7 +46,7 @@ const CreateProperty = () => {
                     <ImageInput />
                 </div>
                 
-                <h3 className='text-lg mt-8 mb-4 font-medium'>Accommodation Details</h3>
+                <h3 className='text-lg mt-8 mb-4 font-medium capitalize'>accommodation details</h3>
                 <CounterInput detail='guests' />
                 <CounterInput detail='bedrooms' />
                 <CounterInput detail='beds' />
