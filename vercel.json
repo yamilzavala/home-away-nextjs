@@ -1,4 +1,4 @@
 {
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --registry=https://registry.npmjs.org/",
   "buildCommand": "pnpm run build"
 }
