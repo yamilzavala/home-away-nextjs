@@ -327,9 +327,59 @@ export const fetchPropertyReviews = async (propertyId: string) => {
 }
 
 export const fetchPropertyReviewsByUser = async () => {
-  return {message: 'fetch reviews by user'}
+  const user = await getAuthUser()
+  const reviews = await db.review.findMany({
+    where: {
+      profileId: user.id
+    },
+    select: {
+      id: true,
+      rating: true,
+      comment: true,
+      property: {
+        select: {
+          name: true,
+          image: true,
+        },
+      },
+    },
+  })
+  return reviews
 }
 
-export const deleteReviewAction = async () => {
+export const deleteReviewAction = async (prevState: {reviewId: string}) => {
+  const {reviewId} = prevState;
+  const user = await getAuthUser()
+  try {
+    await db.review.delete({
+      where: {
+        id: reviewId,
+        profileId: user.id
+      }
+    })
+    revalidatePath('/reviews')
+    return {message: 'Review deleted successfully'}
+  } catch (error) {
+    renderError(error);
+  }
   return {message: 'delete review'}
+}
+
+export const fetchPropertyRating = async (propertyId: string) => {
+  const result = await db.review.groupBy({
+    by: ['propertyId'],
+    _avg: {
+      rating: true,
+    },
+    _count: {
+      rating: true,
+    },
+    where: {
+      propertyId,
+    },
+  })
+  return {
+    rating: result[0]?._avg.rating?.toFixed() ?? 0,
+    count: result[0]?._count.rating ?? 0,
+  }
 }

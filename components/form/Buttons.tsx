@@ -4,6 +4,7 @@ import { useFormStatus } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { SignInButton } from '@clerk/nextjs';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
+import { LuPen, LuTrash2 } from "react-icons/lu";
 
 type btnSize = 'default' | 'lg' | 'sm';
 
@@ -12,6 +13,36 @@ type SubmitButtonProps = {
     text?: string;
     size?: btnSize;
 };
+
+type actionType = 'delete' | 'edit';
+
+export const IconButton = ({actionType}: {actionType: actionType}) => {
+    const {pending} = useFormStatus()
+
+    const renderIcon = () => {
+        switch (actionType) {
+            case 'edit':
+              return <LuPen />   
+            case 'delete':
+              return <LuTrash2 />     
+        
+            default:
+              const never: never = actionType;
+              throw new Error(`Invalid action type: ${never}`);
+        }
+    }
+
+    return (
+        <Button 
+          variant='link'
+          size='icon'
+          type='submit'
+          className='p-2 cursor-pointer'
+        >
+            {pending ? <ReloadIcon className="animate-spin" /> : renderIcon()}
+        </Button>
+    )
+}
 
 export const SubmitButton = ({ className = '', text = 'submit', size = 'lg' }: SubmitButtonProps) => {
     const {pending} = useFormStatus()
