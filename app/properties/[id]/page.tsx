@@ -1,6 +1,6 @@
 import FavoriteToggleButton from '@/components/card/FavoriteToggleButton';
 import PropertyRating from '@/components/card/PropertyRating';
-import BookingCalendar from '@/components/properties/booking/BookingCalendar';
+
 import BreadCrumbs from '@/components/properties/BreadCrumbs';
 import ImageContainer from '@/components/properties/ImageContainer';
 import PropertyDetails from '@/components/properties/PropertyDetails';
@@ -15,6 +15,9 @@ import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 import SubmitReview from '@/components/reviews/SubmitReview';
 import PropertyReviews from '@/components/reviews/PropertyReviews';
+import { findExistingReview } from '@/utils/actions';
+import { auth } from '@clerk/nextjs/server';
+
 const DynamicMap = dynamic(
     () => import('@/components/properties/PropertyMap'),
     {
@@ -23,13 +26,27 @@ const DynamicMap = dynamic(
     }
 )
 
+const DynamicBookingWrapper = dynamic(
+    () => import('@/components/booking/BookingWrapper'),
+    {
+        ssr: false,
+        loading: () => <Skeleton className='h-[200px] w-full' />
+    }
+)
+
 async function PropertyDetailsPage({ params }: { params: { id: string } }) {
+  const {userId} = auth();
   const property = await fetchPropertyDetails(params.id);
   if (!property) redirect('/');
   const { baths, bedrooms, beds, guests } = property;
   const details = { baths, bedrooms, beds, guests };
   const firstName = property.profile.firstName;
   const profileImage = property.profile.profileImage;
+
+  const isNotOwner = property.profile.clerkId !== userId;
+  const reviewDoesNotExist = userId && isNotOwner && !(await findExistingReview(property.id, userId))
+
+
 
   return (
     <section>
@@ -61,11 +78,15 @@ async function PropertyDetailsPage({ params }: { params: { id: string } }) {
             </div>
             <div className='lg:col-span-4 flex flex-col items-center'>
                 {/* calendar */}
-                <BookingCalendar />
+                <DynamicBookingWrapper 
+                    propertyId={property.id}
+                    price={property.price}
+                    bookings={property.bookings}
+                />
             </div>
         </section>
 
-        <SubmitReview propertyId={property.id} />
+        {reviewDoesNotExist && <SubmitReview propertyId={property.id} />}
         <PropertyReviews propertyId={property.id} />
     </section>
   )
