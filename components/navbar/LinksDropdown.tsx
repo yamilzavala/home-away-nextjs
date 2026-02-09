@@ -17,8 +17,11 @@ import {
   SignUpButton 
 } from '@clerk/nextjs'
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { auth } from '@clerk/nextjs/server';
 
 const LinksDropdown = () => {
+  const {userId} = auth();
+  const isAdminUser = userId === process.env.ADMIN_USER_ID;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -49,6 +52,7 @@ const LinksDropdown = () => {
 
         <SignedIn>
           {links.map((link) => {
+            if(link.label === 'admin' && !isAdminUser) return null;
             return <DropdownMenuItem key={link.href}>
               <Link href={link.href} className='capitalize w-full'>{link.label}</Link>
             </DropdownMenuItem>
