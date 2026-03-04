@@ -4,10 +4,15 @@ import FormInput from "@/components/form/FormInput"
 import ImageInput from "@/components/form/ImageInput"
 import ImageInputContainer from "@/components/form/ImageInputContainer"
 import { updateProfileAction, fetchProfile, fetchProfileImage, updateProfileImageAction } from "@/utils/actions"
+import { redirect } from "next/navigation"
 
 
 const ProfilePage = async () => {
   const profile = await fetchProfile()
+  
+  if (!profile) {
+    redirect('/profile/create')
+  }
 
   return (
     <section>

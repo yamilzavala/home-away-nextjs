@@ -70,7 +70,6 @@ const getAuthUser = async () => {
   if (!user) {
     throw new Error('You must be logged in to access this route');
   }
-  if (!user.privateMetadata.hasProfile) redirect('/profile/create');
   return user;
 };
 
@@ -81,7 +80,6 @@ export const fetchProfile = async () => {
       clerkId: user?.id,
     },
   });
-  if (!profile) redirect('/profile/create');
   return profile;
 };
 
