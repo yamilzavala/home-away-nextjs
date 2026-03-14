@@ -28,6 +28,11 @@ vi.mock('@/components/form/Buttons', () => ({
   SubmitButton: ({ text }: { text: string }) => <button>{text}</button>,
 }));
 
+// Mock utils/actions to avoid Prisma dependency
+vi.mock('@/utils/actions', () => ({
+  createBookingAction: () => Promise.resolve({ message: 'Booking created' }),
+}));
+
 describe('ConfirmBooking Component', () => {
   const mockRange = {
     from: new Date(2024, 0, 1),

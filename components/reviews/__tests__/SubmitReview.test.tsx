@@ -24,6 +24,11 @@ vi.mock('@/components/form/Buttons', () => ({
   SubmitButton: ({ text }: any) => <button type="submit">{text}</button>,
 }));
 
+// Mock utils/actions to avoid Prisma dependency
+vi.mock('@/utils/actions', () => ({
+  createReviewAction: () => Promise.resolve({ message: 'Review created' }),
+}));
+
 describe('SubmitReview Component', () => {
   const propertyId = 'prop-123';
 
