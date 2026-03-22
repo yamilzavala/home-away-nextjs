@@ -47,7 +47,7 @@ describe('BookingCalendar Component', () => {
 
   it('renders the calendar', () => {
     render(<BookingCalendar />);
-    expect(screen.getByTestId('mock-calendar-break-test')).toBeInTheDocument();
+    expect(screen.getByTestId('mock-calendar')).toBeInTheDocument();
   });
 
   it('updates the store when a range is selected', async () => {
